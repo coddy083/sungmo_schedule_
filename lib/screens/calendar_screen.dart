@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/calendar_controller.dart';
 import '../controllers/work_controller.dart';
+import '../models/work_model.dart';
 import '../utils/date_utils.dart';
 import '../widgets/calendar_widget.dart';
 import '../widgets/work_schedule_detail.dart';
@@ -149,6 +150,53 @@ class CalendarScreen extends StatelessWidget {
   ) {
     if (calendarController.selectedDate == null) return;
 
+    // 선택한 날짜에 이미 일정이 있는지 확인
+    final existingSchedules = calendarController.selectedDateSchedules;
+    final hasExistingSchedules = existingSchedules.isNotEmpty;
+
+    // 기존 일정이 있는 경우 경고 다이얼로그 표시
+    if (hasExistingSchedules) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('기존 일정 확인'),
+          content: const Text('이 날짜에 이미 등록된 일정이 있습니다. 삭제하고 새로운 일정을 등록하시겠습니까?'),
+          actions: [
+            TextButton(
+              onPressed: () => Get.back(),
+              child: const Text('취소'),
+            ),
+            TextButton(
+              onPressed: () {
+                // 기존 일정 모두 삭제
+                final schedulesToDelete =
+                    List<WorkSchedule>.from(existingSchedules);
+                for (final schedule in schedulesToDelete) {
+                  calendarController.deleteWorkSchedule(schedule.id);
+                }
+                Get.back();
+
+                // 새 일정 등록 폼 표시
+                _showWorkScheduleForm(
+                    context, calendarController, workController);
+              },
+              child: const Text('확인'),
+            ),
+          ],
+        ),
+      );
+    } else {
+      // 기존 일정이 없는 경우 바로 등록 폼 표시
+      _showWorkScheduleForm(context, calendarController, workController);
+    }
+  }
+
+  // 근무 일정 등록 폼 표시
+  void _showWorkScheduleForm(
+    BuildContext context,
+    CalendarController calendarController,
+    WorkController workController,
+  ) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
