@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_calendar/widgets/calendar_day_widget.dart';
 import '../models/calendar_model.dart';
-import 'calendar_day_widget.dart';
 
 class CalendarGridWidget extends StatelessWidget {
   final CalendarMonth calendarMonth;
@@ -24,22 +24,21 @@ class CalendarGridWidget extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children:
-                weekdayLabels.map((label) {
-                  final isWeekend = label == '토' || label == '일';
-                  return SizedBox(
-                    width: 40,
-                    child: Center(
-                      child: Text(
-                        label,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: isWeekend ? Colors.red : Colors.black87,
-                        ),
-                      ),
+            children: weekdayLabels.map((label) {
+              final isWeekend = label == '토' || label == '일';
+              return SizedBox(
+                width: 40,
+                child: Center(
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: isWeekend ? Colors.red : Colors.black87,
                     ),
-                  );
-                }).toList(),
+                  ),
+                ),
+              );
+            }).toList(),
           ),
         ),
 
