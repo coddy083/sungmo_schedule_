@@ -17,6 +17,13 @@ class WorkCodeScreen extends StatelessWidget {
         centerTitle: true,
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () => _showResetConfirmDialog(context),
+            tooltip: '데이터 초기화',
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -230,37 +237,67 @@ class WorkCodeScreen extends StatelessWidget {
           () => Wrap(
             spacing: 8,
             runSpacing: 8,
-            children:
-                predefinedColors.map((color) {
-                  final isSelected = color == selectedColor.value;
+            children: predefinedColors.map((color) {
+              final isSelected = color == selectedColor.value;
 
-                  return GestureDetector(
-                    onTap: () => selectedColor.value = color,
-                    child: Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: ColorUtils.fromHex(color),
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: isSelected ? Colors.black : Colors.transparent,
-                          width: 2,
-                        ),
-                      ),
-                      child:
-                          isSelected
-                              ? const Icon(
-                                Icons.check,
-                                color: Colors.white,
-                                size: 20,
-                              )
-                              : null,
+              return GestureDetector(
+                onTap: () => selectedColor.value = color,
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: ColorUtils.fromHex(color),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: isSelected ? Colors.black : Colors.transparent,
+                      width: 2,
                     ),
-                  );
-                }).toList(),
+                  ),
+                  child: isSelected
+                      ? const Icon(
+                          Icons.check,
+                          color: Colors.white,
+                          size: 20,
+                        )
+                      : null,
+                ),
+              );
+            }).toList(),
           ),
         ),
       ],
+    );
+  }
+
+  // 데이터 초기화 확인 다이얼로그
+  void _showResetConfirmDialog(BuildContext context) {
+    Get.dialog(
+      AlertDialog(
+        title: const Text('데이터 초기화'),
+        content: const Text(
+          '모든 근무 코드와 일정 데이터가 삭제되고 기본 근무 코드로 초기화됩니다.\n\n계속하시겠습니까?',
+          style: TextStyle(color: Colors.red),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('취소'),
+          ),
+          TextButton(
+            onPressed: () {
+              workController.clearAllStorage();
+              Get.back();
+              Get.snackbar(
+                '초기화 완료',
+                '모든 데이터가 초기화되었습니다.',
+                snackPosition: SnackPosition.BOTTOM,
+              );
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('초기화'),
+          ),
+        ],
+      ),
     );
   }
 }

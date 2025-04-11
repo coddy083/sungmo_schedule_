@@ -25,6 +25,13 @@ class CalendarScreen extends StatelessWidget {
         foregroundColor: Colors.white,
         elevation: 0,
         actions: [
+          // 대량 근무 등록 버튼
+          IconButton(
+            icon: const Icon(Icons.add_chart),
+            onPressed: () => _showBulkScheduleDialog(
+                context, workController, calendarController),
+            tooltip: '근무표 일괄 등록',
+          ),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () => _openWorkCodeScreen(workController),
@@ -168,5 +175,169 @@ class CalendarScreen extends StatelessWidget {
   // 근무 코드 관리 화면 열기
   void _openWorkCodeScreen(WorkController workController) {
     Get.to(() => WorkCodeScreen(workController: workController));
+  }
+
+  // 대량 근무 일정 등록 다이얼로그
+  void _showBulkScheduleDialog(
+    BuildContext context,
+    WorkController workController,
+    CalendarController calendarController,
+  ) {
+    // 2025년 4월로 고정
+    int year = 2025;
+    int month = 4;
+
+    // 근무 코드 목록
+    final workCodes = workController.workCodes;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('근무표 일괄 등록'),
+        content: SizedBox(
+          width: MediaQuery.of(context).size.width * 0.8,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('이미지의 근무표를 참고하여 2025년 4월 근무표를 일괄 등록합니다.'),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  // 기존 일정 삭제
+                  workController.clearAllData();
+
+                  // 이미지 근무표에 맞게 근무 등록
+                  _registerBulkSchedules(year, month, workController);
+
+                  // 2025년 4월로 달력 변경
+                  calendarController.setMonth(DateTime(year, month));
+
+                  Get.back();
+                  Get.snackbar(
+                    '등록 완료',
+                    '근무표가 일괄 등록되었습니다.',
+                    snackPosition: SnackPosition.BOTTOM,
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('일괄 등록하기'),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('취소'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 이미지 근무표에 맞게 근무 일정 등록
+  void _registerBulkSchedules(
+      int year, int month, WorkController workController) {
+    // 근무 코드 ID 찾기
+    Map<String, String> codeMap = {};
+    for (final code in workController.workCodes) {
+      codeMap[code.code] = code.id;
+    }
+
+    // 이미지의 근무표에 맞게 데이터 정의
+    final scheduleData = {
+      1: 'OF',
+      2: 'D4',
+      3: 'D4',
+      4: 'E5',
+      5: 'C',
+      6: 'OF',
+      7: 'E5',
+      8: 'E5',
+      9: 'E5',
+      10: 'E5',
+      11: 'OF',
+      12: 'V',
+      13: 'OF',
+      14: 'D4',
+      15: 'V',
+      16: 'D4',
+      17: 'E5',
+      18: 'V',
+      19: 'D4',
+      20: 'OF',
+      21: 'E5',
+      22: 'OF',
+      23: 'D4',
+      24: 'E5',
+      25: 'V',
+      26: 'D4',
+      27: 'OF',
+      28: 'D4',
+      29: 'OF',
+      30: 'D16',
+    };
+
+    // 근무 시간 설정 (근무 코드별 시작/종료 시간)
+    final timeMap = {
+      'D4': {'startHour': 7, 'startMinute': 0, 'endHour': 16, 'endMinute': 0},
+      'E5': {'startHour': 12, 'startMinute': 0, 'endHour': 21, 'endMinute': 0},
+      'D16': {
+        'startHour': 10,
+        'startMinute': 30,
+        'endHour': 19,
+        'endMinute': 30
+      },
+      // 휴무는 기본 시간으로 처리
+      'V': {'startHour': 0, 'startMinute': 0, 'endHour': 0, 'endMinute': 0},
+      'C': {'startHour': 0, 'startMinute': 0, 'endHour': 0, 'endMinute': 0},
+      'OF': {'startHour': 0, 'startMinute': 0, 'endHour': 0, 'endMinute': 0},
+    };
+
+    // 일정 등록
+    scheduleData.forEach((day, codeStr) {
+      if (codeMap.containsKey(codeStr)) {
+        final codeId = codeMap[codeStr]!;
+        final timeData = timeMap[codeStr]!;
+
+        // 날짜 생성
+        final date = DateTime(year, month, day);
+
+        // 시작/종료 시간 생성
+        final startTime = DateTime(
+          year,
+          month,
+          day,
+          timeData['startHour']!,
+          timeData['startMinute']!,
+        );
+
+        final endTime = DateTime(
+          year,
+          month,
+          day,
+          timeData['endHour']!,
+          timeData['endMinute']!,
+        );
+
+        // 휴무 코드인 경우 메모 추가
+        String? note;
+        if (codeStr != 'D4' && codeStr != 'D16' && codeStr != 'E5') {
+          note = '휴무';
+        }
+
+        // 일정 추가
+        workController.addWorkSchedule(
+          date: date,
+          workCodeId: codeId,
+          startTime: startTime,
+          endTime: endTime,
+          note: note,
+        );
+      }
+    });
   }
 }

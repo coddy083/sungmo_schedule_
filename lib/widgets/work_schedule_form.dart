@@ -21,16 +21,12 @@ class WorkScheduleForm extends StatefulWidget {
 }
 
 class _WorkScheduleFormState extends State<WorkScheduleForm> {
-  late TimeOfDay _startTime;
-  late TimeOfDay _endTime;
   late String _selectedWorkCodeId;
   final TextEditingController _noteController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _startTime = const TimeOfDay(hour: 9, minute: 0);
-    _endTime = const TimeOfDay(hour: 18, minute: 0);
 
     // 초기 근무 코드 설정
     if (widget.workController.workCodes.isNotEmpty) {
@@ -62,28 +58,6 @@ class _WorkScheduleFormState extends State<WorkScheduleForm> {
 
           // 근무 코드 선택
           _buildWorkCodeDropdown(),
-          const SizedBox(height: 16),
-
-          // 시작/종료 시간 선택
-          Row(
-            children: [
-              Expanded(
-                child: _buildTimePicker(
-                  label: '시작 시간',
-                  time: _startTime,
-                  onChanged: (time) => setState(() => _startTime = time),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildTimePicker(
-                  label: '종료 시간',
-                  time: _endTime,
-                  onChanged: (time) => setState(() => _endTime = time),
-                ),
-              ),
-            ],
-          ),
           const SizedBox(height: 16),
 
           // 메모
@@ -169,35 +143,6 @@ class _WorkScheduleFormState extends State<WorkScheduleForm> {
     });
   }
 
-  // 시간 선택 필드
-  Widget _buildTimePicker({
-    required String label,
-    required TimeOfDay time,
-    required Function(TimeOfDay) onChanged,
-  }) {
-    return GestureDetector(
-      onTap: () async {
-        final TimeOfDay? pickedTime = await showTimePicker(
-          context: context,
-          initialTime: time,
-        );
-
-        if (pickedTime != null) {
-          onChanged(pickedTime);
-        }
-      },
-      child: InputDecorator(
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
-        ),
-        child: Text(
-          '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}',
-        ),
-      ),
-    );
-  }
-
   // 근무 일정 저장
   void _saveWorkSchedule() {
     // 근무 코드 ID가 유효하지 않으면 처리하지 않음
@@ -206,22 +151,30 @@ class _WorkScheduleFormState extends State<WorkScheduleForm> {
       return;
     }
 
-    // 시작/종료 시간 DateTime 객체로 변환
+    // 선택한 근무 코드 찾기
+    final selectedWorkCode = widget.workController.workCodes.firstWhere(
+      (code) => code.id == _selectedWorkCodeId,
+    );
+
+    // 근무 코드에 따라 시간 설정
+    Map<String, int> timeData = _getTimeForWorkCode(selectedWorkCode.code);
+
+    // 시작/종료 시간 설정
     final selectedDate = widget.selectedDate;
     final startDateTime = DateTime(
       selectedDate.year,
       selectedDate.month,
       selectedDate.day,
-      _startTime.hour,
-      _startTime.minute,
+      timeData['startHour']!,
+      timeData['startMinute']!,
     );
 
     final endDateTime = DateTime(
       selectedDate.year,
       selectedDate.month,
       selectedDate.day,
-      _endTime.hour,
-      _endTime.minute,
+      timeData['endHour']!,
+      timeData['endMinute']!,
     );
 
     // 종료 시간이 시작 시간보다 이른 경우 다음 날로 설정
@@ -246,6 +199,36 @@ class _WorkScheduleFormState extends State<WorkScheduleForm> {
       Get.back();
     } catch (e) {
       Get.snackbar('오류', e.toString(), snackPosition: SnackPosition.BOTTOM);
+    }
+  }
+
+  // 근무 코드에 따른 시간 설정
+  Map<String, int> _getTimeForWorkCode(String code) {
+    switch (code) {
+      case 'D4':
+        return {
+          'startHour': 7,
+          'startMinute': 0,
+          'endHour': 16,
+          'endMinute': 0
+        };
+      case 'E5':
+        return {
+          'startHour': 12,
+          'startMinute': 0,
+          'endHour': 21,
+          'endMinute': 0
+        };
+      case 'D16':
+        return {
+          'startHour': 10,
+          'startMinute': 30,
+          'endHour': 19,
+          'endMinute': 30
+        };
+      default:
+        // 기본값 또는 휴무 코드
+        return {'startHour': 0, 'startMinute': 0, 'endHour': 0, 'endMinute': 0};
     }
   }
 }
