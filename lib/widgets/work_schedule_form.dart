@@ -209,21 +209,21 @@ class _WorkScheduleFormState extends State<WorkScheduleForm> {
         return {
           'startHour': 7,
           'startMinute': 0,
-          'endHour': 16,
+          'endHour': 15,
           'endMinute': 0
         };
       case 'E5':
         return {
           'startHour': 12,
           'startMinute': 0,
-          'endHour': 21,
+          'endHour': 20,
           'endMinute': 0
         };
       case 'D16':
         return {
           'startHour': 10,
           'startMinute': 30,
-          'endHour': 19,
+          'endHour': 18,
           'endMinute': 30
         };
       default:

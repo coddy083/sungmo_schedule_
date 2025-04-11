@@ -331,12 +331,12 @@ class CalendarScreen extends StatelessWidget {
 
     // 근무 시간 설정 (근무 코드별 시작/종료 시간)
     final timeMap = {
-      'D4': {'startHour': 7, 'startMinute': 0, 'endHour': 16, 'endMinute': 0},
-      'E5': {'startHour': 12, 'startMinute': 0, 'endHour': 21, 'endMinute': 0},
+      'D4': {'startHour': 7, 'startMinute': 0, 'endHour': 15, 'endMinute': 0},
+      'E5': {'startHour': 12, 'startMinute': 0, 'endHour': 20, 'endMinute': 0},
       'D16': {
         'startHour': 10,
         'startMinute': 30,
-        'endHour': 19,
+        'endHour': 18,
         'endMinute': 30
       },
       // 휴무는 기본 시간으로 처리
