@@ -29,8 +29,8 @@ class _WorkScheduleFormState extends State<WorkScheduleForm> {
   @override
   void initState() {
     super.initState();
-    _startTime = TimeOfDay(hour: 9, minute: 0);
-    _endTime = TimeOfDay(hour: 18, minute: 0);
+    _startTime = const TimeOfDay(hour: 9, minute: 0);
+    _endTime = const TimeOfDay(hour: 18, minute: 0);
 
     // 초기 근무 코드 설정
     if (widget.workController.workCodes.isNotEmpty) {
@@ -136,30 +136,28 @@ class _WorkScheduleFormState extends State<WorkScheduleForm> {
           labelText: '근무 코드',
           border: OutlineInputBorder(),
         ),
-        value:
-            workCodes.any((code) => code.id == _selectedWorkCodeId)
-                ? _selectedWorkCodeId
-                : workCodes.first.id,
-        items:
-            workCodes.map((workCode) {
-              return DropdownMenuItem<String>(
-                value: workCode.id,
-                child: Row(
-                  children: [
-                    Container(
-                      width: 16,
-                      height: 16,
-                      decoration: BoxDecoration(
-                        color: ColorUtils.fromHex(workCode.color),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text('${workCode.code} - ${workCode.name}'),
-                  ],
+        value: workCodes.any((code) => code.id == _selectedWorkCodeId)
+            ? _selectedWorkCodeId
+            : workCodes.first.id,
+        items: workCodes.map((workCode) {
+          return DropdownMenuItem<String>(
+            value: workCode.id,
+            child: Row(
+              children: [
+                Container(
+                  width: 16,
+                  height: 16,
+                  decoration: BoxDecoration(
+                    color: ColorUtils.fromHex(workCode.color),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
                 ),
-              );
-            }).toList(),
+                const SizedBox(width: 8),
+                Text('${workCode.code} - ${workCode.name}'),
+              ],
+            ),
+          );
+        }).toList(),
         onChanged: (value) {
           if (value != null) {
             setState(() {
@@ -227,10 +225,9 @@ class _WorkScheduleFormState extends State<WorkScheduleForm> {
     );
 
     // 종료 시간이 시작 시간보다 이른 경우 다음 날로 설정
-    final endDateTimeAdjusted =
-        endDateTime.isBefore(startDateTime)
-            ? endDateTime.add(const Duration(days: 1))
-            : endDateTime;
+    final endDateTimeAdjusted = endDateTime.isBefore(startDateTime)
+        ? endDateTime.add(const Duration(days: 1))
+        : endDateTime;
 
     try {
       // 근무 일정 추가

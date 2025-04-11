@@ -19,7 +19,7 @@ class WorkController extends GetxController {
 
   // 게터
   List<WorkCode> get workCodes => _workCodes;
-  List<WorkSchedule> get workSchedules => _workSchedules;
+  RxList<WorkSchedule> get workSchedules => _workSchedules;
 
   @override
   void onInit() {
@@ -37,11 +37,15 @@ class WorkController extends GetxController {
     } else {
       // 기본 근무 코드 설정
       _workCodes.assignAll([
-        const WorkCode(id: '1', code: 'DAY', name: '주간 근무', color: '#4CAF50'),
-        const WorkCode(id: '2', code: 'NIGHT', name: '야간 근무', color: '#2196F3'),
         const WorkCode(
-            id: '3', code: 'HOLIDAY', name: '휴일 근무', color: '#F44336'),
-        const WorkCode(id: '4', code: 'VACATION', name: '휴가', color: '#FF9800'),
+            id: '1', code: 'D4', name: '데이(07:00)', color: '#4CAF50'),
+        const WorkCode(
+            id: '2', code: 'E5', name: '이브닝(12:00)', color: '#2196F3'),
+        const WorkCode(
+            id: '3', code: 'D16', name: '시차(10:30)', color: '#F44336'),
+        const WorkCode(id: '4', code: 'OF', name: '휴무(오프)', color: '#FF9800'),
+        const WorkCode(id: '5', code: 'V', name: '휴가', color: '#9C27B0'),
+        const WorkCode(id: '6', code: 'C', name: '교육', color: '#795548'),
       ]);
       _saveWorkCodesToStorage();
     }

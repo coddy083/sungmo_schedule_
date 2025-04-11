@@ -16,19 +16,17 @@ class CalendarDayWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textColor =
-        day.isCurrentMonth
-            ? day.isToday
-                ? Colors.white
-                : day.isSelected
+    final textColor = day.isCurrentMonth
+        ? day.isToday
+            ? Colors.white
+            : day.isSelected
                 ? Colors.white
                 : Colors.black87
-            : Colors.grey.withOpacity(0.5);
+        : Colors.grey.withAlpha(128);
 
-    final backgroundColor =
-        day.isToday
-            ? Colors.blue
-            : day.isSelected
+    final backgroundColor = day.isToday
+        ? Colors.blue
+        : day.isSelected
             ? Colors.deepPurple
             : Colors.transparent;
 
@@ -52,10 +50,9 @@ class CalendarDayWidget extends StatelessWidget {
                     '${day.date.day}',
                     style: TextStyle(
                       color: textColor,
-                      fontWeight:
-                          day.isToday || day.isSelected
-                              ? FontWeight.bold
-                              : FontWeight.normal,
+                      fontWeight: day.isToday || day.isSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
                     ),
                   ),
 

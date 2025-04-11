@@ -96,7 +96,7 @@ class WorkScheduleDetail extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        color: _getWorkColor(workCode.color).withOpacity(0.2),
+        color: _getWorkColor(workCode.color).withAlpha(51),
         border: Border.all(color: _getWorkColor(workCode.color), width: 1),
       ),
       child: Row(

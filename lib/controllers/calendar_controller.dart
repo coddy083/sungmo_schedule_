@@ -12,6 +12,7 @@ class CalendarController extends GetxController {
   final Rx<DateTime> _selectedMonth = DateTime.now().obs;
   final Rx<DateTime?> _selectedDate = Rx<DateTime?>(DateTime.now());
   final RxList<WorkSchedule> _selectedDateSchedules = <WorkSchedule>[].obs;
+  final RxBool _needsRefresh = false.obs; // 화면 갱신 트리거
 
   // 게터
   DateTime get selectedMonth => _selectedMonth.value;
@@ -28,6 +29,12 @@ class CalendarController extends GetxController {
 
     // 선택 날짜가 변경될 때마다 일정 목록 업데이트
     ever(_selectedDate, (_) => _loadSelectedDateSchedules());
+
+    // 근무 일정 변경시 화면 갱신을 위한 리스너
+    ever(workController.workSchedules, (_) {
+      _loadSelectedDateSchedules();
+      _needsRefresh.toggle(); // 화면 갱신 트리거
+    });
   }
 
   /// 선택 날짜의 일정 로드
@@ -88,20 +95,22 @@ class CalendarController extends GetxController {
     final bool isCurrentMonthToday =
         today.year == month.year && today.month == month.month;
 
+    // 갱신 트리거 확인 (명시적으로 의존성 추가)
+    _needsRefresh.value;
+
     // 달력에 표시될 6주(42일) 생성
     for (int i = 0; i < 42; i++) {
       final DateTime date = firstCalendarDay.add(Duration(days: i));
       final bool isCurrentMonth = date.month == month.month;
       final bool isToday = isCurrentMonthToday && date.day == today.day;
-      final bool isSelected =
-          _selectedDate.value != null &&
+      final bool isSelected = _selectedDate.value != null &&
           date.year == _selectedDate.value!.year &&
           date.month == _selectedDate.value!.month &&
           date.day == _selectedDate.value!.day;
 
       // 이 날짜의 근무 일정 가져오기
-      final List<WorkSchedule> schedules = workController
-          .getWorkSchedulesByDate(date);
+      final List<WorkSchedule> schedules =
+          workController.getWorkSchedulesByDate(date);
 
       days.add(
         CalendarDay(
@@ -141,13 +150,17 @@ class CalendarController extends GetxController {
       note: note,
     );
 
-    _loadSelectedDateSchedules();
+    // 화면 갱신 트리거
+    _needsRefresh.toggle();
+
     return schedule;
   }
 
   /// 근무 일정 삭제
   void deleteWorkSchedule(String id) {
     workController.deleteWorkSchedule(id);
-    _loadSelectedDateSchedules();
+
+    // 화면 갱신 트리거
+    _needsRefresh.toggle();
   }
 }

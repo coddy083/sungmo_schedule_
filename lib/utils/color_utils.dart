@@ -17,14 +17,13 @@ class ColorUtils {
 
   /// Color 객체를 HEX 색상 코드로 변환
   static String toHex(Color color) {
-    return '#${color.value.toRadixString(16).substring(2)}';
+    return '#${color.toARGB32().toRadixString(16).substring(2)}';
   }
 
   /// 색상의 밝기 확인
   static bool isDark(Color color) {
     // 색상의 밝기 계산 (0.0 ~ 1.0)
-    final brightness =
-        (color.red * 299 + color.green * 587 + color.blue * 114) / 1000;
+    final brightness = (color.r * 299 + color.g * 587 + color.b * 114) / 1000;
     return brightness < 128; // 128 이하면 어둡다고 판단
   }
 
