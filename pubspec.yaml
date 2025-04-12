@@ -37,6 +37,7 @@ dependencies:
   get: ^4.6.5 # GetX 상태 관리 패키지
   get_storage: ^2.1.1 # Get Storage 로컬 저장소 패키지
   intl: ^0.18.1 # 날짜 포맷팅을 위한 패키지
+  flutter_local_notifications: ^19.0.0
 
 dev_dependencies:
   flutter_test:
